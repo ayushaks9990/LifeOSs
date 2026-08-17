@@ -8,39 +8,53 @@ services:
     dockerContext: ./backend
     healthCheckPath: /health
     autoDeployTrigger: commit
+
     envVars:
       - key: DATABASE_URL
         fromDatabase:
           name: lifeos-postgres
           property: connectionString
+
       - key: ENVIRONMENT
         value: production
+
       - key: ALLOWED_ORIGINS
         value: "*"
+
       - key: SECRET_KEY
         generateValue: true
+
       - key: APP_ENCRYPTION_KEY
         generateValue: true
+
+      # Groq/OpenAI-compatible LLM
       - key: LLM_BASE_URL
         value: https://api.groq.com/openai/v1
+
       - key: LLM_MODEL
         value: llama-3.3-70b-versatile
+
       - key: LLM_API_KEY
         sync: false
+
+      # Official YouTube Data API
       - key: YOUTUBE_API_KEY
         sync: false
+
       - key: YOUTUBE_REGION
         value: IN
+
+      # Gmail and Google Calendar
       - key: GOOGLE_CLIENT_ID
         sync: false
+
       - key: GOOGLE_CLIENT_SECRET
         sync: false
+
+      # Kept empty so LifeOS derives the callback from
+      # the public frontend URL automatically.
       - key: GOOGLE_REDIRECT_URI
         value: ""
-      - key: WHATSAPP_VERIFY_TOKEN
-        sync: false
-      - key: WHATSAPP_APP_SECRET
-        sync: false
 
   - type: web
     name: lifeos-web
@@ -51,12 +65,14 @@ services:
     dockerContext: ./frontend
     healthCheckPath: /health
     autoDeployTrigger: commit
+
     envVars:
       - key: BACKEND_HOST
         fromService:
           type: web
           name: lifeos-api
           property: host
+
       - key: BACKEND_PORT
         fromService:
           type: web
@@ -69,4 +85,3 @@ databases:
     region: singapore
     databaseName: lifeos
     user: lifeos
-
