@@ -1,0 +1,27 @@
+services:
+  api:
+    build: ./backend
+    ports:
+      - "8000:10000"
+    env_file:
+      - ./backend/.env
+    environment:
+      DATABASE_URL: sqlite:////data/lifeos.db
+      PORT: 10000
+    volumes:
+      - lifeos_data:/data
+
+  web:
+    build: ./frontend
+    ports:
+      - "5173:10000"
+    environment:
+      PORT: 10000
+      BACKEND_HOST: api
+      BACKEND_PORT: 10000
+    depends_on:
+      - api
+
+volumes:
+  lifeos_data:
+
