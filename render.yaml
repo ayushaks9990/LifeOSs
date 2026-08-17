@@ -27,7 +27,6 @@ services:
       - key: APP_ENCRYPTION_KEY
         generateValue: true
 
-      # Groq/OpenAI-compatible LLM
       - key: LLM_BASE_URL
         value: https://api.groq.com/openai/v1
 
@@ -37,22 +36,18 @@ services:
       - key: LLM_API_KEY
         sync: false
 
-      # Official YouTube Data API
       - key: YOUTUBE_API_KEY
         sync: false
 
       - key: YOUTUBE_REGION
         value: IN
 
-      # Gmail and Google Calendar
       - key: GOOGLE_CLIENT_ID
         sync: false
 
       - key: GOOGLE_CLIENT_SECRET
         sync: false
 
-      # Kept empty so LifeOS derives the callback from
-      # the public frontend URL automatically.
       - key: GOOGLE_REDIRECT_URI
         value: ""
 
@@ -63,7 +58,7 @@ services:
     region: singapore
     dockerfilePath: ./frontend/Dockerfile
     dockerContext: ./frontend
-    healthCheckPath: /health
+    healthCheckPath: /
     autoDeployTrigger: commit
 
     envVars:
