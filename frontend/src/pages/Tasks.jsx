@@ -9,7 +9,11 @@ export default function Tasks() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
   const load = () => api('/api/tasks').then(setItems).catch(e => setError(e.message)).finally(() => setLoading(false))
-  useEffect(load, [])
+  useEffect(() => {
+    // Never return the request Promise from an effect. React treats an effect
+    // return value as its cleanup function and would crash while changing routes.
+    void load()
+  }, [])
   async function add(e) {
     e.preventDefault(); setError('')
     try {
@@ -26,4 +30,3 @@ export default function Tasks() {
     <Card className="list-card">{loading ? <Loading /> : items.length ? <div className="item-list">{items.map(item => <div className={`list-item ${item.status === 'done' ? 'completed' : ''}`} key={item.id}><button className="check-button" onClick={() => toggle(item)}>{item.status === 'done' ? <Check /> : <Circle />}</button><div className="item-main"><strong>{item.title}</strong><span>{item.due_at ? new Date(item.due_at).toLocaleString() : 'No deadline'}</span></div><Pill tone={item.priority}>{item.priority}</Pill><button className="icon-danger" onClick={() => remove(item.id)}><Trash2 /></button></div>)}</div> : <Empty>Add your first task—or say “add task to…” in the assistant.</Empty>}</Card>
   </>
 }
-
