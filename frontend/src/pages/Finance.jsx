@@ -9,7 +9,10 @@ export default function Finance() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const load = () => api('/api/finance').then(setItems).catch(e => setError(e.message)).finally(() => setLoading(false))
-  useEffect(load, [])
+  useEffect(() => {
+    // Invoke the async loader without returning its Promise to React.
+    void load()
+  }, [])
   const totals = useMemo(() => items.reduce((a, x) => ({ ...a, [x.kind]: a[x.kind] + x.amount }), { income: 0, expense: 0 }), [items])
   async function add(e) { e.preventDefault(); try { await api('/api/finance', { method: 'POST', body: JSON.stringify({ ...form, amount: Number(form.amount) }) }); setForm({ ...form, title: '', amount: '' }); load() } catch (e) { setError(e.message) } }
   async function remove(id) { await api(`/api/finance/${id}`, { method: 'DELETE' }); load() }
@@ -21,4 +24,3 @@ export default function Finance() {
     <Card className="list-card">{loading ? <Loading /> : items.length ? <div className="item-list">{items.map(item => <div className="list-item" key={item.id}><div className={`money-icon ${item.kind}`}>{item.kind === 'income' ? <ArrowDownLeft /> : <ArrowUpRight />}</div><div className="item-main"><strong>{item.title}</strong><span>{new Date(`${item.occurred_on}T00:00:00`).toLocaleDateString()}</span></div><Pill>{item.category}</Pill><strong className={`money ${item.kind}`}>{item.kind === 'income' ? '+' : '-'} ₹{item.amount.toLocaleString('en-IN')}</strong><button className="icon-danger" onClick={() => remove(item.id)}><Trash2 /></button></div>)}</div> : <Empty>Record an entry or say “I spent 250 on lunch”.</Empty>}</Card>
   </>
 }
-
