@@ -9,7 +9,10 @@ export default function Goals() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const load = () => api('/api/goals').then(setItems).catch(e => setError(e.message)).finally(() => setLoading(false))
-  useEffect(load, [])
+  useEffect(() => {
+    // Keep the Promise inside the effect so route unmounting has no invalid cleanup.
+    void load()
+  }, [])
   async function add(e) { e.preventDefault(); try { await api('/api/goals', { method: 'POST', body: JSON.stringify({ ...form, target_date: form.target_date || null }) }); setForm({ title: '', target_date: '' }); load() } catch (e) { setError(e.message) } }
   async function progress(id, value) { setItems(x => x.map(g => g.id === id ? { ...g, progress: Number(value) } : g)); await api(`/api/goals/${id}`, { method: 'PATCH', body: JSON.stringify({ progress: Number(value) }) }) }
   async function remove(id) { await api(`/api/goals/${id}`, { method: 'DELETE' }); load() }
@@ -20,4 +23,3 @@ export default function Goals() {
     {loading ? <Loading /> : items.length ? <div className="goals-grid">{items.map(goal => <Card className="goal-card" key={goal.id}><div className="goal-top"><div className="metric-icon cyan"><Target /></div><button className="icon-danger" onClick={() => remove(goal.id)}><Trash2 /></button></div><h3>{goal.title}</h3><p>{goal.target_date ? `Target ${new Date(`${goal.target_date}T00:00:00`).toLocaleDateString()}` : 'No target date'}</p><div className="goal-progress"><span>Progress <b>{goal.progress}%</b></span><input type="range" min="0" max="100" value={goal.progress} onChange={e => progress(goal.id, e.target.value)} /><div><i style={{ width: `${goal.progress}%` }} /></div></div></Card>)}</div> : <Card><Empty>Set your first goal. LifeOS will use it when planning your day.</Empty></Card>}
   </>
 }
-
