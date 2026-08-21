@@ -1,9 +1,10 @@
-from functools import lru_cache
+from functools import lru_cache # Then The decorator that stores the result of a function call and reuses it instead of running the function again.
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    
     app_name: str = "LifeOS API"
     environment: str = "development"
     database_url: str = "sqlite:///./lifeos.db"
@@ -11,9 +12,9 @@ class Settings(BaseSettings):
     app_encryption_key: str = "development-encryption-key"
     access_token_minutes: int = 60 * 24 * 7
     allowed_origins: str = "http://localhost:5173"
-
     llm_api_key: str = ""
     llm_base_url: str = "https://api.groq.com/openai/v1"
+   
     llm_model: str = "llama-3.3-70b-versatile"
 
     youtube_api_key: str = ""
