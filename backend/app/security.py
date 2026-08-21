@@ -3,16 +3,13 @@ import hashlib
 import hmac
 import os
 from datetime import datetime, timedelta, timezone
-
 import jwt
-from cryptography.fernet import Fernet, InvalidToken
 
+from cryptography.fernet import Fernet, InvalidToken
 from .config import settings
 
 
 PBKDF2_ITERATIONS = 310_000
-
-
 def hash_password(password: str) -> str:
     salt = os.urandom(16)
     digest = hashlib.pbkdf2_hmac("sha256", password.encode(), salt, PBKDF2_ITERATIONS)
