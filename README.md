@@ -12,7 +12,7 @@
 [![Groq](https://img.shields.io/badge/Groq-FF5A1F?style=for-the-badge&logoColor=white)](https://groq.com/)
 [![Render](https://img.shields.io/badge/Render-111827?style=for-the-badge&logo=render&logoColor=46E3B7)](https://render.com/)
 
-[Live App](https://lifeos-web-jomn.onrender.com) · [API Health](https://lifeos-api-eh4l.onrender.com/health) · [Architecture](#-system-architecture) · [Deploy](#-deploy-to-render) · [Demo Video](https://drive.google.com/file/d/1sJgZ24y1zy55BQF8AEzyY-s0p-lQHu8a/view?usp=sharing)
+[Live App](https://lifeos-web-jomn.onrender.com) · [API Health](https://lifeos-api-eh4l.onrender.com/health) · [Architecture](#-system-architecture) · [Deploy](#-deploy-to-render) · [Demo Video](https://drive.google.com/file/d/1cnSFoS-CdvN2Tu0umT61fORPsfanc9rE/view?usp=sharing)
 <br />
 
 > **Think less about managing. Live more.**  
