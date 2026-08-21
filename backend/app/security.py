@@ -63,6 +63,8 @@ def read_oauth_state(state: str) -> int:
     return int(payload["sub"])
 
 
+
+
 def _fernet() -> Fernet:
     digest = hashlib.sha256(settings.app_encryption_key.encode()).digest()
     return Fernet(base64.urlsafe_b64encode(digest))
