@@ -3,7 +3,6 @@
 # ✦ LifeOS
 
 ### Your life. One intelligence.
-
 **A voice-first, multi-agent personal AI operating system that turns natural language into useful action.**
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-0B8F7A?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
