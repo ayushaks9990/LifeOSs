@@ -1,11 +1,10 @@
 from datetime import date, datetime, timedelta, timezone
-
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
-
 from ..dependencies import get_current_user, get_db
 from ..models import CalendarEvent, FinanceEntry, Goal, MemoryItem, Task, User
+
 from ..schemas import (
     EventCreate,
     EventOut,
@@ -15,16 +14,18 @@ from ..schemas import (
     GoalOut,
     GoalUpdate,
     MemoryCreate,
+
     MemoryOut,
     TaskCreate,
     TaskOut,
     TaskUpdate,
 )
-
-
+#This Then recives the requiesT from fronTend and send To parTicular backends
+# RouTes The info from all pages and show on overview of each pages(Tasks/goals)
 router = APIRouter(prefix="/api", tags=["life"])
 
-
+# It is a helper function that finds an item belonging to the logged-in user, and gives a 404 error if it cannot find it.
+#Recives Then 4 Things db, Table,object_id(id of The Task/goal),user_id
 def owned_or_404(db: Session, model, object_id: int, user_id: int):
     item = db.scalar(select(model).where(model.id == object_id, model.user_id == user_id))
     if not item:
