@@ -1,14 +1,10 @@
-import httpx
-
+import httpx # make HTTP/API requesTs.
 from ..config import settings
-
-
 class LLMUnavailable(RuntimeError):
     pass
-
-
 async def chat(messages: list[dict[str, str]], temperature: float = 0.35, max_tokens: int = 700) -> str:
     if not settings.llm_api_key:
+
         raise LLMUnavailable("LLM_API_KEY is not configured")
     url = f"{settings.llm_base_url.rstrip('/')}/chat/completions"
     payload = {
@@ -18,6 +14,7 @@ async def chat(messages: list[dict[str, str]], temperature: float = 0.35, max_to
         "max_tokens": max_tokens,
     }
     try:
+        
         async with httpx.AsyncClient(timeout=45) as client:
             response = await client.post(
                 url,
@@ -37,4 +34,6 @@ async def chat(messages: list[dict[str, str]], temperature: float = 0.35, max_to
             except ValueError:
                 pass
         raise LLMUnavailable(f"Language model request failed: {detail}") from exc
+
+
 
