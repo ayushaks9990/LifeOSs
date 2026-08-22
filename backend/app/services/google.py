@@ -24,7 +24,6 @@ def ensure_google_configured() -> None:
     if not settings.google_client_id or not settings.google_client_secret:
         raise HTTPException(status_code=503, detail="Google OAuth credentials are not configured")
 
-
 def authorization_url(state: str, redirect_uri: str) -> str:
     ensure_google_configured()
     params = {
