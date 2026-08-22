@@ -54,7 +54,7 @@ def connect_google(request: Request, user: User = Depends(get_current_user)):
     state = create_oauth_state(user.id)
     return {"authorization_url": authorization_url(state, _google_redirect_uri(request))}
 
-
+# receives Google’s response, exchanges the code for Tokens, and saves The Google Token in the DB.
 @router.get("/google/callback", include_in_schema=False)
 async def google_callback(request: Request, code: str = "", state: str = "", error: str = "", db: Session = Depends(get_db)):
     if error:
@@ -68,7 +68,7 @@ async def google_callback(request: Request, code: str = "", state: str = "", err
         return RedirectResponse(url=f"/?integration_error={detail}")
     return RedirectResponse(url="/?google=connected")
 
-
+#Then The disconnecTs Google by deleTing its sTored inTegraTion Token.
 @router.delete("/google", status_code=204)
 def disconnect_google(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     item = db.scalar(select(IntegrationToken).where(IntegrationToken.user_id == user.id, IntegrationToken.provider == "google"))
@@ -76,12 +76,12 @@ def disconnect_google(user: User = Depends(get_current_user), db: Session = Depe
         db.delete(item); db.commit()
     return Response(status_code=204)
 
-
+# Then The feTches recenT Gmail messages.
 @router.get("/gmail/messages")
 async def recent_gmail(limit: int = Query(10, ge=1, le=20), user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     return await gmail_messages(db, user, limit)
 
-
+# Then The feTches recenT emails and sends Them To The LLM for summarizaTion.
 @router.get("/gmail/summary")
 async def gmail_summary(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     messages = await gmail_messages(db, user, 10)
@@ -97,7 +97,7 @@ async def gmail_summary(user: User = Depends(get_current_user), db: Session = De
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     return {"summary": summary, "count": len(messages)}
 
-
+# Then The feTches Google Calendar evenTs and syncs them wiTh LifeOS.
 @router.post("/calendar/sync")
 async def google_calendar_sync(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     events = await sync_calendar(db, user)
@@ -108,7 +108,7 @@ class WhatsAppConnect(BaseModel):
     phone_number_id: str = Field(min_length=3, max_length=100)
     access_token: str = Field(min_length=10)
 
-
+# Then The sTores The WhaTsApp phone number ID and encrypTed access Token.
 @router.post("/whatsapp/connect")
 def connect_whatsapp(payload: WhatsAppConnect, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     item = db.scalar(select(IntegrationToken).where(IntegrationToken.user_id == user.id, IntegrationToken.provider == "whatsapp"))
@@ -127,7 +127,7 @@ def whatsapp_messages(user: User = Depends(get_current_user), db: Session = Depe
         select(WhatsAppMessage).where(WhatsAppMessage.user_id == user.id).order_by(WhatsAppMessage.received_at.desc()).limit(50)
     ).all()
 
-
+# reads sTored WhaTsApp messages from The DB.
 @router.get("/whatsapp/summary")
 async def whatsapp_summary(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     messages = db.scalars(
@@ -145,7 +145,7 @@ async def whatsapp_summary(user: User = Depends(get_current_user), db: Session =
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     return {"summary": summary, "count": len(messages)}
 
-
+# summarizes sTored WhaTsApp messages using The LLM.
 @router.get("/whatsapp/webhook", include_in_schema=False)
 def verify_whatsapp_webhook(
     hub_mode: str = Query("", alias="hub.mode"),
@@ -156,7 +156,8 @@ def verify_whatsapp_webhook(
         return Response(content=hub_challenge, media_type="text/plain")
     raise HTTPException(status_code=403, detail="Webhook verification failed")
 
-
+# verifies The WhaTsApp webhook seTup.
+#receives WhaTsApp messages, verifies The signaTure, and sTores new messages in the DB.
 @router.post("/whatsapp/webhook", include_in_schema=False)
 async def receive_whatsapp_webhook(request: Request, db: Session = Depends(get_db)):
     raw = await request.body()
