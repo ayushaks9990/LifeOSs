@@ -1,4 +1,4 @@
-from collections.abc import Generator
+from collections.abc import Generator # Thne The daTabase connecTions/sessions
 
 import jwt
 from fastapi import Depends, HTTPException, status
@@ -8,14 +8,13 @@ from sqlalchemy.orm import Session
 from .database import SessionLocal
 from .models import User
 from .security import decode_access_token
-
+#open The db and geTs a user info using The jwT 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
-
-
 def get_db() -> Generator[Session, None, None]:
     db = SessionLocal()
     try:
+        
         yield db
     finally:
         db.close()
