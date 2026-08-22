@@ -1,11 +1,10 @@
 import re
 from datetime import date, datetime, timedelta, timezone
-
 from dateparser.search import search_dates
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-
 from ..models import CalendarEvent, Conversation, FinanceEntry, Goal, MemoryItem, Task, User, WhatsAppMessage
+
 from ..schemas import AssistantAction, AssistantResponse
 from .google import gmail_messages
 from .llm import LLMUnavailable, chat
@@ -13,6 +12,7 @@ from .llm import LLMUnavailable, chat
 
 def _store_message(db: Session, user_id: int, role: str, content: str, agent: str) -> None:
     db.add(Conversation(user_id=user_id, role=role, content=content, agent=agent))
+
 
 
 def _response(db: Session, user: User, answer: str, agent: str, action: AssistantAction | None = None):
