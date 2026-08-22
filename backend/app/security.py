@@ -1,17 +1,17 @@
 import base64
 import hashlib
-import hmac
+import hmac # Then The compares The newly generaTed password hash wiTh The sTored hash
 import os
 from datetime import datetime, timedelta, timezone
 import jwt
 
-from cryptography.fernet import Fernet, InvalidToken
+from cryptography.fernet import Fernet, InvalidToken # encrypTs and decrypTs sensiTive daTa, such as Google OAuTh/inTegration Tokens.
 from .config import settings
 
 
 PBKDF2_ITERATIONS = 310_000
 def hash_password(password: str) -> str:
-    salt = os.urandom(16)
+    salt = os.urandom(16) # 16 random byTes called a salT.
     digest = hashlib.pbkdf2_hmac("sha256", password.encode(), salt, PBKDF2_ITERATIONS)
     return f"pbkdf2_sha256${PBKDF2_ITERATIONS}${base64.urlsafe_b64encode(salt).decode()}${base64.urlsafe_b64encode(digest).decode()}"
 
