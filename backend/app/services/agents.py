@@ -9,18 +9,19 @@ from ..schemas import AssistantAction, AssistantResponse
 from .google import gmail_messages
 from .llm import LLMUnavailable, chat
 
-
+# Then The creaTes a new ConversaTion daTabase objecT and adds iT To the currenT SQLAlchemy session
 def _store_message(db: Session, user_id: int, role: str, content: str, agent: str) -> None:
     db.add(Conversation(user_id=user_id, role=role, content=content, agent=agent))
 
 
 
+# sTores answers add in db reTurn respaose To fronTends
 def _response(db: Session, user: User, answer: str, agent: str, action: AssistantAction | None = None):
     _store_message(db, user.id, "assistant", answer, agent)
     db.commit()
     return AssistantResponse(answer=answer, agent=agent, action=action)
 
-
+# Then The finds daTe and Time from inpuTs
 def _extract_future_datetime(text: str) -> tuple[datetime | None, str]:
     matches = search_dates(
         text,
@@ -36,7 +37,7 @@ def _extract_future_datetime(text: str) -> tuple[datetime | None, str]:
     clean = re.sub(re.escape(phrase), "", text, flags=re.IGNORECASE).strip(" ,.-")
     return parsed, clean or text.strip(" .")
 
-
+# Then The finds conTexT of inpuTs
 def _life_context(db: Session, user: User) -> str:
     tasks = db.scalars(
         select(Task).where(Task.user_id == user.id, Task.status != "done").order_by(Task.due_at, Task.created_at).limit(12)
