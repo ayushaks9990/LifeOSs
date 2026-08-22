@@ -1,20 +1,20 @@
 import base64
 from datetime import datetime, timedelta, timezone
 from urllib.parse import urlencode
-
 import httpx
 from fastapi import HTTPException
 from sqlalchemy import select
-from sqlalchemy.orm import Session
 
+from sqlalchemy.orm import Session
 from ..config import settings
 from ..models import CalendarEvent, IntegrationToken, User
-from ..security import decrypt_secret, encrypt_secret
+from ..security import decrypt_secret, encrypt_secret # google auTh Tokens encrypT and decrypT
 
 
 GOOGLE_SCOPES = [
     "openid",
     "email",
+    
     "https://www.googleapis.com/auth/gmail.readonly",
     "https://www.googleapis.com/auth/calendar",
 ]
@@ -39,7 +39,7 @@ def authorization_url(state: str, redirect_uri: str) -> str:
     }
     return "https://accounts.google.com/o/oauth2/v2/auth?" + urlencode(params)
 
-
+# Takes The Google OAuTh code and exchanges iT for an access Token/refresh Token to use Google APIs.
 async def exchange_code(code: str, redirect_uri: str) -> dict:
     ensure_google_configured()
     async with httpx.AsyncClient(timeout=30) as client:
@@ -57,7 +57,7 @@ async def exchange_code(code: str, redirect_uri: str) -> dict:
         raise HTTPException(status_code=400, detail=response.json().get("error_description", "Google OAuth failed"))
     return response.json()
 
-
+# Then The Finds/creaTes the user's Google Token record, encrypTs and saves the Tokens, expiry Time, and scopes in the daTabase.
 def save_google_token(db: Session, user_id: int, data: dict) -> IntegrationToken:
     token = db.scalar(
         select(IntegrationToken).where(
@@ -76,7 +76,7 @@ def save_google_token(db: Session, user_id: int, data: dict) -> IntegrationToken
     db.refresh(token)
     return token
 
-
+# GeTs the saved Google access Token, refreshes iT if it is expired/near expiry, and returns a valid access Token.
 async def access_token_for(db: Session, user: User) -> str:
     token = db.scalar(
         select(IntegrationToken).where(
@@ -109,9 +109,10 @@ async def access_token_for(db: Session, user: User) -> str:
     save_google_token(db, user.id, {**response.json(), "refresh_token": refresh_token})
     return response.json()["access_token"]
 
-
+# Finds a specific email header by name (case-insensiTive) and reTurns its value.
 def _decode_header(headers: list[dict], name: str) -> str:
     return next((h.get("value", "") for h in headers if h.get("name", "").lower() == name.lower()), "")
+
 
 
 async def gmail_messages(db: Session, user: User, limit: int = 10) -> list[dict]:
@@ -146,7 +147,8 @@ async def gmail_messages(db: Session, user: User, limit: int = 10) -> list[dict]
             )
     return result
 
-
+#Then The FeTches The user's Google Calendar evenTs for The nexT days and creaTes/updaTes them in the local database.
+#AnyThing in google calender addeds geT addes in Taks goals in The db
 async def sync_calendar(db: Session, user: User, days: int = 30) -> list[CalendarEvent]:
     token = await access_token_for(db, user)
     now = datetime.now(timezone.utc)
