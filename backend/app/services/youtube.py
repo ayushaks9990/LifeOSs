@@ -1,9 +1,6 @@
 import httpx
-
 from ..config import settings
 from ..schemas import YouTubeTrack
-
-
 class YouTubeError(RuntimeError):
     pass
 
@@ -17,6 +14,7 @@ async def search_tracks(query: str, limit: int = 6) -> list[YouTubeTrack]:
         "type": "video",
         "videoCategoryId": "10",
         "videoEmbeddable": "true",
+        
         "safeSearch": "moderate",
         "maxResults": min(max(limit, 1), 12),
         "regionCode": settings.youtube_region,
@@ -55,4 +53,3 @@ async def search_tracks(query: str, limit: int = 6) -> list[YouTubeTrack]:
     if not tracks:
         raise YouTubeError("No playable YouTube videos matched that search")
     return tracks
-
