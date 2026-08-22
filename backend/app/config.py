@@ -1,6 +1,6 @@
 from functools import lru_cache # Then The decorator that stores the result of a function call and reuses it instead of running the function again.
 from pydantic import field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, SettingsConfigDict #helps in reading The enviromenTs variables on render
 
 
 class Settings(BaseSettings):
