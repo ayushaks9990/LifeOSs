@@ -1,6 +1,6 @@
 import base64
 from datetime import datetime, timedelta, timezone
-from urllib.parse import urlencode
+from urllib.parse import urlencode # Then The converT PyThon key-value daTa inTo URL query parameTers.
 import httpx
 from fastapi import HTTPException
 from sqlalchemy import select
