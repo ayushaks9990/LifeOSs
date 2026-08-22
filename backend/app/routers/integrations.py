@@ -2,37 +2,38 @@ import hashlib
 import hmac
 import json
 from datetime import datetime, timezone
-
 import jwt
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
+
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-
 from ..config import settings
 from ..dependencies import get_current_user, get_db
 from ..models import IntegrationToken, User, WhatsAppMessage
 from ..security import create_oauth_state, encrypt_secret, read_oauth_state
 from ..services.google import (
+
     authorization_url,
     exchange_code,
     gmail_messages,
     save_google_token,
     sync_calendar,
 )
+#This Then file handles exTernal inTegraTions
 from ..services.llm import LLMUnavailable, chat
 
 
 router = APIRouter(prefix="/api/integrations", tags=["integrations"])
 
-
+# Finds The public url where my backend is runnings
 def _public_base(request: Request) -> str:
-    proto = request.headers.get("x-forwarded-proto", request.url.scheme).split(",")[0].strip()
-    host = request.headers.get("x-forwarded-host", request.headers.get("host", request.url.netloc)).split(",")[0].strip()
+    proto = request.headers.get("x-forwarded-proto", request.url.scheme).split(",")[0].strip()# ProTocols hTTps of hTTp
+    host = request.headers.get("x-forwarded-host", request.headers.get("host", request.url.netloc)).split(",")[0].strip() #hosT or domain name
     return f"{proto}://{host}"
 
-
+#After the user logs in with Google, send them back here. https://lifeos-api.onrender.com/api/integrations/google/callback 
 def _google_redirect_uri(request: Request) -> str:
     return settings.google_redirect_uri or f"{_public_base(request)}/api/integrations/google/callback"
 
