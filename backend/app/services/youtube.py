@@ -52,4 +52,5 @@ async def search_tracks(query: str, limit: int = 6) -> list[YouTubeTrack]:
         )
     if not tracks:
         raise YouTubeError("No playable YouTube videos matched that search")
+   
     return tracks
